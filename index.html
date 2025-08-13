@@ -30,6 +30,35 @@
       transition: background 0.2s, box-shadow 0.2s;
     }
 
+    /* FAQ Styles */
+    .faq-question svg {
+      transition: transform 0.3s ease;
+    }
+    
+    .faq-answer {
+      transition: all 0.3s ease;
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+    }
+    
+    .faq-answer[style*="display: block"] {
+      max-height: 200px;
+      opacity: 1;
+    }
+    
+    .faq-question:hover {
+      background-color: #f9fafb;
+    }
+    
+    .faq-item {
+      transition: box-shadow 0.2s ease;
+    }
+    
+    .faq-item:hover {
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+    }
+
     .btn-offers:hover {
       background: #16a34a;
       box-shadow: 0px 8px 16px -4px rgba(34, 197, 94, 0.25);
@@ -670,61 +699,8 @@
     </div>
   </div>
   <script>
-    const images = [
-      '/public/image1_1753360687579-CYUBc5dU.png',
-      '/public/image2_1753360687580-BgOQ1KGA.png',
-      '/public/image3_1753360687580-CtJLT3-e.png',
-      '/public/image4_1753360687580-B00Ltb7l.png',
-      '/public/image5_1753360687580-BYJmAoAn.png',
-      '/public/image6_1753360687581-BV86s6jZ.png',
-      '/public/image7_1753360687581-B9q1HUMf.png',
-      '/public/image_1753360687579-CG8IIUNm.png',
-      '/public/1 (1)_1753391807468-B4Nxqkjm.webp',
-      '/public/2_1753391811735-C8itGVTb.webp',
-      '/public/3_1753391813174-CP_Q4mXc.webp',
-    ];
-    let current = 0;
-    const img = document.getElementById('carouselImg');
-    const carouselWrapper = img.parentElement;
+    
 
-    function carouselScrollImage(nextIndex, direction) {
-      const newImg = document.createElement('img');
-      newImg.src = images[nextIndex];
-      newImg.alt = 'Capa do livro';
-      newImg.style.width = '352px';
-      newImg.style.height = '256px';
-      newImg.style.objectFit = 'cover';
-      newImg.style.borderRadius = '12px';
-      newImg.style.boxShadow = '0px 4px 6px -4px rgba(0,0,0,0.10)';
-      newImg.style.position = 'absolute';
-      newImg.style.left = '0';
-      newImg.style.top = '0';
-      newImg.style.transition = 'transform 0.5s cubic-bezier(.77,0,.18,1)';
-      newImg.style.transform = direction === 'next' ? 'translateX(100%)' : 'translateX(-100%)';
-      carouselWrapper.appendChild(newImg);
-      setTimeout(() => {
-        img.style.transform = direction === 'next' ? 'translateX(-100%)' : 'translateX(100%)';
-        img.style.transition = 'transform 0.5s cubic-bezier(.77,0,.18,1)';
-        newImg.style.transform = 'translateX(0)';
-      }, 10);
-      setTimeout(() => {
-        img.src = images[nextIndex];
-        img.style.transform = 'translateX(0)';
-        img.style.transition = '';
-        carouselWrapper.removeChild(newImg);
-      }, 510);
-    }
-
-    document.getElementById('prevBtn').onclick = function () {
-      const nextIndex = (current - 1 + images.length) % images.length;
-      carouselScrollImage(nextIndex, 'prev');
-      current = nextIndex;
-    };
-    document.getElementById('nextBtn').onclick = function () {
-      const nextIndex = (current + 1) % images.length;
-      carouselScrollImage(nextIndex, 'next');
-      current = nextIndex;
-    };
 
     const clientImages = [
       '/public/521550251_17864190222431182_3519950276659251994_n_1753593623908-Bfgxr024.jpg',
@@ -766,29 +742,59 @@
       }, 510);
     }
 
-    document.getElementById('client-prev').onclick = function () {
-      const nextIndex = (clientCurrent - 1 + clientImages.length) % clientImages.length;
-      clientScrollImage(nextIndex, 'prev');
-      clientCurrent = nextIndex;
-    };
-    document.getElementById('client-next').onclick = function () {
-      const nextIndex = (clientCurrent + 1) % clientImages.length;
-      clientScrollImage(nextIndex, 'next');
-      clientCurrent = nextIndex;
-    };
-    document.querySelectorAll('.faq-question').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        const item = btn.parentElement;
-        const answer = item.querySelector('.faq-answer');
-        const isOpen = answer.style.display === 'block';
-        document.querySelectorAll('.faq-answer').forEach(function (a) {
-          a.style.display = 'none';
+    // FAQ Accordion functionality - Complete rewrite
+    function initFAQ() {
+
+      const faqQuestions = document.querySelectorAll('.faq-question');
+
+      
+      faqQuestions.forEach(function (btn, index) {
+        
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          
+          const item = btn.parentElement;
+          const answer = item.querySelector('.faq-answer');
+          const icon = btn.querySelector('svg');
+          
+          if (!answer || !icon) {
+            console.error('Missing answer or icon for FAQ item', index);
+            return;
+          }
+          
+          const isOpen = answer.style.display === 'block';
+          
+          // Close all other FAQ items
+          document.querySelectorAll('.faq-answer').forEach(function (a) {
+            a.style.display = 'none';
+          });
+          
+          // Reset all icons
+          document.querySelectorAll('.faq-question svg').forEach(function (svg) {
+            svg.style.transform = 'rotate(0deg)';
+          });
+          
+          // Toggle current item
+          if (!isOpen) {
+            answer.style.display = 'block';
+            icon.style.transform = 'rotate(180deg)';
+          } else {
+            answer.style.display = 'none';
+            icon.style.transform = 'rotate(0deg)';
+          }
         });
-        if (!isOpen) {
-          answer.style.display = 'block';
-        }
       });
-    });
+    }
+    
+    // Initialize FAQ when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initFAQ);
+    } else {
+      initFAQ();
+    }
+
     document.querySelectorAll('.btn-offers').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.preventDefault();
